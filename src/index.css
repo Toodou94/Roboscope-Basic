@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-hw-bg: #F8FAFC;
+  --color-hw-card: #FFFFFF;
+  --color-hw-accent: #2563EB;
+  --color-hw-success: #059669;
+  --color-hw-warning: #D97706;
+  --color-hw-error: #DC2626;
+  --color-hw-text-main: #1E293B;
+  --color-hw-text-dim: #64748B;
+  --color-hw-border: #E2E8F0;
+}
+
+body {
+  @apply font-sans antialiased bg-slate-200 text-hw-text-main overflow-hidden select-none flex items-center justify-center min-h-screen;
+}
+
+#root {
+  width: 480px;
+  height: 320px;
+  background: var(--color-hw-bg);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Custom scrollbar for small screen */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2D2D2D;
+  border-radius: 2px;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.active-glow {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+@keyframes scan-y {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes scan-x {
+  0% { left: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.animate-scan-y {
+  animation: scan-y 3s linear infinite;
+}
+
+.animate-scan-x {
+  animation: scan-x 4s linear infinite;
+}
