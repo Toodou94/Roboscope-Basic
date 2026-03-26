@@ -484,7 +484,6 @@ export default function App() {
     { id: 'light', name: '光源模块', status: 'pending' },
     { id: 'touch', name: '触摸屏模块', status: 'pending' },
     { id: 'storage', name: '存储与数据', status: 'pending' },
-    { id: 'algo', name: '算法模块', status: 'pending' },
   ]);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [itemElapsed, setItemElapsed] = useState(0);
@@ -513,8 +512,6 @@ export default function App() {
   const [scanProgress, setScanProgress] = useState(0);
   const [scannedTiles, setScannedTiles] = useState<string[]>([]);
 
-  const [isFovEnlarged, setIsFovEnlarged] = useState(false);
-  
   // Movement Timer
   const moveTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -951,50 +948,44 @@ export default function App() {
 
       {/* Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Far Left: Whole Slide Preview */}
-        <div className="w-[70px] border-r border-hw-border p-1 bg-white flex flex-col gap-1 shadow-inner">
+        {/* Far Left: Loader Slide Tray */}
+        <div className="w-[50px] border-r border-hw-border p-1.5 bg-white flex flex-col gap-2 shadow-inner overflow-y-auto">
           <div className="flex items-center justify-center px-1">
-            <span className="text-[6px] font-bold text-hw-text-dim uppercase tracking-tighter">全玻预览</span>
+            <span className="text-[7px] font-bold text-hw-text-dim uppercase tracking-widest text-center leading-tight">Loader 玻片盘</span>
           </div>
-          <div 
-            className="flex-1 bg-hw-bg rounded-lg border border-hw-border overflow-hidden relative group cursor-pointer"
-            onClick={() => setIsRoiModalOpen(true)}
-          >
-            <img 
-              src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=400" 
-              alt="Slide Preview" 
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-            {/* Current View Indicator */}
-            <div 
-              className="absolute border border-hw-accent bg-hw-accent/10 shadow-[0_0_4px_rgba(59,130,246,0.5)]"
-              style={{ 
-                width: '12px', 
-                height: '12px', 
-                left: `${35 + (posX/5000) * 20}%`, 
-                top: `${60 + (posY/5000) * 20}%`,
-                transform: 'translate(-50%, -50%)'
-              }}
-            />
-            {/* ROIs on preview */}
-            {rois.map(roi => (
+          <div className="grid grid-cols-1 gap-1.5 p-1 bg-hw-bg rounded-lg border border-hw-border shadow-inner">
+            {[1, 2, 3, 4, 5, 6].map((id) => (
               <div 
-                key={roi.id}
-                className="absolute border border-hw-accent/60 bg-hw-accent/5"
-                style={{ 
-                  left: `${roi.x}%`, 
-                  top: `${roi.y}%`, 
-                  width: `${roi.width}%`, 
-                  height: `${roi.height}%` 
-                }}
-              />
+                key={id} 
+                onClick={id === 1 ? () => setIsRoiModalOpen(true) : undefined}
+                className={`relative aspect-[1/2.5] bg-white border rounded-sm flex flex-col items-center justify-between py-1 cursor-pointer transition-all hover:border-hw-accent group ${
+                  id === 1 ? 'border-hw-accent shadow-sm ring-1 ring-hw-accent/20' : 'border-hw-border opacity-40'
+                }`}
+              >
+                <span className="text-[6px] font-bold text-hw-text-dim group-hover:text-hw-accent transition-colors">{id}</span>
+                <div className="w-[80%] h-[70%] bg-slate-50 border border-hw-border/30 rounded-[1px] relative overflow-hidden">
+                  {id === 1 && (
+                    <div 
+                      className="absolute w-1.5 h-1.5 border border-hw-accent bg-hw-accent/40 shadow-[0_0_2px_rgba(59,130,246,0.5)]"
+                      style={{ 
+                        left: `${35 + (posX/5000) * 20}%`, 
+                        top: `${60 + (posY/5000) * 20}%`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                    />
+                  )}
+                </div>
+                <div className="w-[60%] h-[1px] bg-hw-border/40" />
+              </div>
             ))}
+          </div>
+          <div className="mt-auto p-1 bg-slate-50 rounded-lg border border-hw-border/50">
+            <p className="text-[6px] text-hw-text-dim leading-tight">点击玻片 1 进入 ROI 规划</p>
           </div>
         </div>
 
         {/* Middle: Optical Controls */}
-        <div className="w-[120px] border-r border-hw-border p-1 flex flex-col gap-1 bg-white/50">
+        <div className="w-[130px] border-r border-hw-border p-1.5 flex flex-col gap-2 bg-white/50">
           <section className="flex flex-col gap-0.5">
             <div className="flex items-center justify-between px-1">
               <span className="text-[7px] font-bold text-hw-text-dim uppercase tracking-widest">物镜</span>
@@ -1019,21 +1010,23 @@ export default function App() {
 
           <section className="flex flex-col gap-0.5">
             <span className="text-[7px] font-bold text-hw-text-dim uppercase tracking-widest px-1">成像模式</span>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-1.5">
               <button 
                 onClick={() => setMode('B')}
-                className={`flex items-center justify-center py-1 rounded-lg border transition-all ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl border transition-all gap-1 ${
                   mode === 'B' ? "bg-hw-accent border-hw-accent text-white shadow-md shadow-hw-accent/20" : "bg-white border-hw-border text-hw-text-dim"
                 }`}
               >
+                <Sun size={12} />
                 <span className="text-[8px] font-bold">明场</span>
               </button>
               <button 
                 onClick={() => setMode('FLU')}
-                className={`flex items-center justify-center py-1 rounded-lg border transition-all ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl border transition-all gap-1 ${
                   mode === 'FLU' ? "bg-hw-accent border-hw-accent text-white shadow-md shadow-hw-accent/20" : "bg-white border-hw-border text-hw-text-dim"
                 }`}
               >
+                <Zap size={12} />
                 <span className="text-[8px] font-bold">荧光</span>
               </button>
             </div>
@@ -1070,79 +1063,27 @@ export default function App() {
 
           <section className="flex flex-col gap-0.5">
             <span className="text-[7px] font-bold text-hw-text-dim uppercase tracking-widest px-1">对焦方式</span>
-            <div className="grid grid-cols-2 gap-1">
+            <div className="grid grid-cols-2 gap-1.5">
               <button 
                 onClick={() => { setFocusMode('MANUAL'); setAfs(false); }}
-                className={`flex items-center justify-center py-1 rounded-lg border transition-all ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl border transition-all gap-1 ${
                   focusMode === 'MANUAL' ? "bg-hw-accent border-hw-accent text-white shadow-md shadow-hw-accent/20" : "bg-white border-hw-border text-hw-text-dim"
                 }`}
               >
+                <Target size={12} />
                 <span className="text-[8px] font-bold">手动对焦</span>
               </button>
               <button 
                 onClick={() => { setFocusMode('AFS'); setAfs(true); }}
-                className={`flex items-center justify-center py-1 rounded-lg border transition-all ${
+                className={`flex flex-col items-center justify-center py-1.5 rounded-xl border transition-all gap-1 ${
                   focusMode === 'AFS' ? "bg-hw-accent border-hw-accent text-white shadow-md shadow-hw-accent/20" : "bg-white border-hw-border text-hw-text-dim"
                 }`}
               >
+                <ShieldCheck size={12} />
                 <span className="text-[8px] font-bold">AFS</span>
               </button>
             </div>
           </section>
-
-          {/* FOV Preview moved here */}
-          <div className="mt-1 flex flex-col gap-1">
-            <span className="text-[7px] font-bold text-hw-text-dim uppercase tracking-widest px-1">视野预览</span>
-            
-            <AnimatePresence>
-              {isFovEnlarged && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setIsFovEnlarged(false)}
-                  className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[140]"
-                />
-              )}
-            </AnimatePresence>
-
-            <motion.div
-              layout
-              drag={isFovEnlarged}
-              dragMomentum={false}
-              onDoubleClick={() => setIsFovEnlarged(!isFovEnlarged)}
-              className={`aspect-square bg-white border-2 border-hw-accent shadow-sm overflow-hidden cursor-pointer group rounded-xl relative ${
-                isFovEnlarged 
-                  ? 'fixed z-[150] w-[256px] h-[256px] rounded-[24px] shadow-2xl left-[calc(50%-128px)] top-[calc(50%-128px)]' 
-                  : 'w-[80%] mx-auto'
-              }`}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              whileHover={{ scale: isFovEnlarged ? 1 : 1.02 }}
-              whileDrag={{ scale: 1.05, zIndex: 160 }}
-            >
-              <div className="w-full h-full relative">
-                <div className="w-full h-full overflow-hidden flex items-center justify-center bg-hw-bg">
-                  <img 
-                    src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&q=80&w=1200" 
-                    alt="FOV Preview" 
-                    className="min-w-[250%] min-h-[250%] object-cover"
-                    style={{ 
-                      objectPosition: `${35 + (posX/5000) * 20}% ${60 + (posY/5000) * 20}%`
-                    }}
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                {isFovEnlarged && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setIsFovEnlarged(false); }}
-                    className="absolute top-3 right-3 p-1.5 bg-black/10 hover:bg-black/20 text-hw-text-main rounded-full transition-colors"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-            </motion.div>
-          </div>
         </div>
 
         {/* Right: Motion Controls */}
